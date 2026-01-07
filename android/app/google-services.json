@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "211839556822",
+    "project_id": "vibe-note",
+    "storage_bucket": "vibe-note.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211839556822:android:6fc3f607499d90b2a2fd77",
+        "android_client_info": {
+          "package_name": "com.example.vibe_note"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0kJjxlvkmCmEaSz-A2KavGQbwGBsqeGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,23 @@
+{
+    "name": "Vibe Note - 프로젝트 관리",
+    "short_name": "Vibe Note",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#F5F7FA",
+    "theme_color": "#667EEA",
+    "description": "프로젝트 로그와 아이디어를 관리하는 스마트한 노트 앱",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/vibe-note192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/vibe-note512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
