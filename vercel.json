@@ -10,5 +10,10 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/manifest.json", "destination": "/manifest.json" },
+    { "source": "/pwa_service_worker.js", "destination": "/pwa_service_worker.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
