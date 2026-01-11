@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -105,6 +107,58 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   // 현재 조회 중인 프로젝트 상태 ('active' or 'archived')
   String _projectStatus = 'active';
 
+  // 앱 종료 함수
+  void _showExitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.exit_to_app, color: Colors.red.shade400, size: 24),
+            const SizedBox(width: 12),
+            const Text('앱 종료'),
+          ],
+        ),
+        content: Text(
+          kIsWeb
+              ? '앱을 종료하시겠습니까?\n브라우저 탭을 닫아주세요.'
+              : '앱을 종료하시겠습니까?',
+          style: const TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade400,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              if (kIsWeb) {
+                // 웹에서는 사용자에게 브라우저를 닫도록 안내
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('브라우저 탭을 닫아주세요.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                // 모바일/데스크톱에서는 시스템 종료
+                SystemNavigator.pop();
+              }
+            },
+            child: const Text('종료'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // 새 프로젝트 추가 함수
   void _addNewProject() {
     final TextEditingController titleController = TextEditingController();
@@ -119,7 +173,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         builder: (context, setState) => Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -143,10 +197,10 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
               ],
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 700, maxWidth: 600),
+              constraints: const BoxConstraints(maxHeight: 650, maxWidth: 600),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(2),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -174,7 +228,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 // 태그 입력 추가
                 TextField(
                   controller: tagsController,
@@ -200,7 +254,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 // 로고 파일 선택
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,17 +368,17 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                       ),
                       child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 6,
+                        runSpacing: 6,
                         children: projectIcons.map((icon) {
                           final isSelected = selectedIcon == icon;
                           return InkWell(
@@ -338,7 +392,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isSelected 
                                     ? const Color(0xFF667EEA)
@@ -354,7 +408,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                               child: Icon(
                                 icon,
                                 color: Colors.white,
-                                size: 24,
+                                size: 20,
                               ),
                             ),
                           );
@@ -363,7 +417,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -460,10 +514,10 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(4),
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 28,
-                height: 28,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: const Color(0xFF667EEA),
+                size: 28,
               ),
             ),
             const SizedBox(width: 8),
@@ -488,6 +542,11 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             onPressed: () {
               showSearch(context: context, delegate: GlobalSearchDelegate());
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app, color: Colors.black87),
+            onPressed: _showExitDialog,
+            tooltip: '앱 종료',
           ),
           Container(
             margin: const EdgeInsets.only(right: 12),
@@ -707,18 +766,31 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                       child: logoUrl != null && logoUrl.isNotEmpty
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.memory(
-                                base64Decode(logoUrl),
-                                width: 52,
-                                height: 52,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  // 로고 로드 실패 시 기본 아이콘 표시
-                                  return Icon(
-                                    projectIcon,
-                                    color: const Color(0xFF667EEA),
-                                    size: 40,
-                                  );
+                              child: Builder(
+                                builder: (context) {
+                                  try {
+                                    return Image.memory(
+                                      base64Decode(logoUrl),
+                                      width: 52,
+                                      height: 52,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        // 로고 로드 실패 시 기본 아이콘 표시
+                                        return Icon(
+                                          projectIcon,
+                                          color: const Color(0xFF667EEA),
+                                          size: 40,
+                                        );
+                                      },
+                                    );
+                                  } catch (e) {
+                                    // base64 디코딩 실패 시 기본 아이콘 표시
+                                    return Icon(
+                                      projectIcon,
+                                      color: const Color(0xFF667EEA),
+                                      size: 40,
+                                    );
+                                  }
                                 },
                               ),
                             )
