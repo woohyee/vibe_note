@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as markdown;
 import '../services/firestore_service.dart';
 
 class LogListScreen extends StatefulWidget {
@@ -32,7 +34,10 @@ class _LogListScreenState extends State<LogListScreen> {
         title: const Text('로그 수정'),
         content: TextField(
           controller: controller,
-          maxLines: 3,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          minLines: 3,
+          maxLines: 10,
           decoration: const InputDecoration(border: OutlineInputBorder()),
         ),
         actions: [
@@ -98,11 +103,14 @@ class _LogListScreenState extends State<LogListScreen> {
                     child: TextField(
                       controller: _controller,
                       autofocus: true,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      minLines: 1,
+                      maxLines: 5,
                       decoration: const InputDecoration(
                         hintText: '오늘 완료한 작업과 내일 할 일 기록',
                         border: InputBorder.none,
                       ),
-                      onSubmitted: (_) => _addLog(),
                     ),
                   ),
                   IconButton(onPressed: _addLog, icon: const Icon(Icons.send, color: Color(0xFF667EEA))),
@@ -162,7 +170,20 @@ class _LogListScreenState extends State<LogListScreen> {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(data['content'] ?? '', style: const TextStyle(fontSize: 15)),
+                            MarkdownBody(
+                              data: data['content'] ?? '',
+                              extensionSet: markdown.ExtensionSet.gitHubWeb,
+                              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                                p: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 15,
+                                  height: 1.4,
+                                  color: Colors.black87,
+                                ),
+                                tableHead: const TextStyle(fontWeight: FontWeight.bold),
+                                tableBorder: TableBorder.all(color: Colors.grey.shade300),
+                                code: const TextStyle(fontFamily: 'monospace'),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -206,7 +227,10 @@ class _IdeaListScreenState extends State<IdeaListScreen> {
         title: const Text('아이디어 수정'),
         content: TextField(
           controller: controller,
-          maxLines: 3,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          minLines: 3,
+          maxLines: 10,
           decoration: const InputDecoration(border: OutlineInputBorder()),
         ),
         actions: [
@@ -272,11 +296,14 @@ class _IdeaListScreenState extends State<IdeaListScreen> {
                     child: TextField(
                       controller: _controller,
                       autofocus: true,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      minLines: 1,
+                      maxLines: 5,
                       decoration: const InputDecoration(
                         hintText: '번뜩이는 아이디어 기록',
                         border: InputBorder.none,
                       ),
-                      onSubmitted: (_) => _addIdea(),
                     ),
                   ),
                   IconButton(onPressed: _addIdea, icon: const Icon(Icons.lightbulb, color: Color(0xFFEF5350))),
@@ -336,7 +363,20 @@ class _IdeaListScreenState extends State<IdeaListScreen> {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(data['content'] ?? '', style: const TextStyle(fontSize: 15)),
+                            MarkdownBody(
+                              data: data['content'] ?? '',
+                              extensionSet: markdown.ExtensionSet.gitHubWeb,
+                              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                                p: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 15,
+                                  height: 1.4,
+                                  color: Colors.black87,
+                                ),
+                                tableHead: const TextStyle(fontWeight: FontWeight.bold),
+                                tableBorder: TableBorder.all(color: Colors.grey.shade300),
+                                code: const TextStyle(fontFamily: 'monospace'),
+                              ),
+                            ),
                           ],
                         ),
                       ),

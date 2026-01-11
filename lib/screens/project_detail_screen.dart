@@ -1,6 +1,11 @@
+
 import 'dart:convert';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as markdown;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -76,8 +81,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         title: const Text('기록 수정'),
         content: TextField(
           controller: controller,
-          maxLines: 5,
-          minLines: 1,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          maxLines: 10,
+          minLines: 3,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
           ),
@@ -749,16 +756,18 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    content,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.4,
-                      color: Colors.black87,
-                      decoration: (type == 'todo' && isCompleted) 
-                          ? TextDecoration.lineThrough 
-                          : null,
-                      decorationColor: Colors.grey.shade400,
+                  MarkdownBody(
+                    data: content,
+                    extensionSet: markdown.ExtensionSet.gitHubWeb,
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                      p: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 15,
+                        height: 1.4,
+                        color: Colors.black87,
+                      ),
+                      tableHead: const TextStyle(fontWeight: FontWeight.bold),
+                      tableBorder: TableBorder.all(color: Colors.grey.shade300),
+                      code: const TextStyle(fontFamily: 'monospace'),
                     ),
                   ),
                 ],
@@ -773,6 +782,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
   Widget _buildInputArea() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -786,7 +796,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       ),
       child: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 마크다운 툴바
+            _buildMarkdownToolbar(),
+            const SizedBox(height: 8),
             Row(
               children: [
                 // 타입 선택기
@@ -816,9 +830,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       controller: _recordController,
                       autofocus: true,
                       decoration: InputDecoration(
-                        hintText: _selectedType == 'log' 
-                            ? '오늘의 작업 내용과 내일 할 일을 기록하세요.' 
-                            : _selectedType == 'idea' 
+                        hintText: _selectedType == 'log'
+                            ? '오늘의 작업 내용과 내일 할 일을 기록하세요.'
+                            : _selectedType == 'idea'
                                 ? '떠오르는 아이디어를 자유롭게 적어보세요.'
                                 : '할 일을 입력하세요.',
                         hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
@@ -826,9 +840,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      minLines: 1,
-                      maxLines: 4,
-                      onSubmitted: (_) => _addRecord(),
+                      minLines: 2,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+
                     ),
                   ),
                 ),
@@ -848,6 +864,59 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       ),
     );
   }
+
+  // MARKDOWN HELPERS
+  void _applyMarkdown(String prefix, {String suffix = '', bool wrap = true}) {
+    final text = _recordController.text;
+    final selection = _recordController.selection;
+    final start = selection.start;
+    final end = selection.end;
+    if (start < 0 || end < 0) {
+      _recordController.text = prefix + suffix + text;
+      _recordController.selection = TextSelection.collapsed(offset: (prefix + suffix).length);
+      return;
+    }
+    final selected = text.substring(start, end);
+    final newText = wrap
+        ? text.replaceRange(start, end, '$prefix$selected$suffix')
+        : text.replaceRange(start, end, '$prefix$suffix');
+    _recordController.text = newText;
+    final newOffset = start + prefix.length + (wrap ? selected.length : 0);
+    _recordController.selection = TextSelection.collapsed(offset: newOffset);
+  }
+
+  Widget _buildMarkdownToolbar() {
+    return Row(
+      children: [
+        IconButton(
+          tooltip: '굵게 (**bold**)',
+          icon: const Icon(Icons.format_bold),
+          onPressed: () => _applyMarkdown('**'),
+        ),
+        IconButton(
+          tooltip: '기울임 (*italic*)',
+          icon: const Icon(Icons.format_italic),
+          onPressed: () => _applyMarkdown('*'),
+        ),
+        IconButton(
+          tooltip: '제목 (## heading)',
+          icon: const Icon(Icons.title),
+          onPressed: () => _applyMarkdown('## ', suffix: '\n', wrap: false),
+        ),
+        IconButton(
+          tooltip: '리스트 (- item)',
+          icon: const Icon(Icons.format_list_bulleted),
+          onPressed: () => _applyMarkdown('- ', suffix: '\n', wrap: false),
+        ),
+        IconButton(
+          tooltip: '코드 블록 (```)',
+          icon: const Icon(Icons.code),
+          onPressed: () => _applyMarkdown('```\n', suffix: '\n```', wrap: false),
+        ),
+      ],
+    );
+  }
+
   
   Widget _buildTypeSelector(String type, IconData icon) {
     bool isSelected = _selectedType == type;
@@ -966,8 +1035,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: descController,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
                     decoration: const InputDecoration(labelText: '설명', border: OutlineInputBorder()),
-                    maxLines: 3,
+                    minLines: 3,
+                    maxLines: 10,
                   ),
                 ],
               ),

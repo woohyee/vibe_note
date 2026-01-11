@@ -1,0 +1,53 @@
+# Flutter 빌드 파일 (build/web만 배포)
+build/*/!
+build/web/
+
+# iOS 관련
+ios/
+*.xcworkspace
+*.xcodeproj
+Podfile.lock
+Pods/
+
+# Android 관련
+android/
+*.iml
+.gradle/
+local.properties
+
+# macOS 관련
+macos/
+*.pbxproj
+
+# Linux 관련
+linux/
+
+# Windows 관련
+windows/
+
+# IDE 관련
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Flutter 관련
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# 테스트 파일
+test/
+test_*.md
+test*.md
+
+# 기타
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.iml

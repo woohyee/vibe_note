@@ -119,7 +119,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         builder: (context, setState) => Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.all(28),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
@@ -143,7 +143,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
               ],
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 700, maxWidth: 500),
+              constraints: const BoxConstraints(maxHeight: 700, maxWidth: 600),
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(4),
@@ -174,7 +174,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 // 태그 입력 추가
                 TextField(
                   controller: tagsController,
@@ -302,15 +302,6 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  '또는',
-                  style: GoogleFonts.outfit(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
                 // 아이콘 선택
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +363,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
